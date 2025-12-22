@@ -23,6 +23,7 @@
 #define BOOT_PIN 0                   // Boot pin
 #define BOOT_BUTTON_DEBOUCE_TIME 400 // Debounce time when reading the boot button in milliseconds
 #define TOUCH_POLL_INTERVAL_MS 100   // Poll touch screen every 100ms instead of every frame
+#define TOUCH_SKIP_DEBOUNCE_MS 1000  // Only skip one video per second when touch is held
 
 // Some model of cheap Yellow display works only at 40Mhz
 // #define DISPLAY_SPI_SPEED 40000000L // 40MHz
@@ -65,7 +66,8 @@ TFT_Touch touch = TFT_Touch(T_CS, T_CLK, T_DIN, T_DO);
 // Interrupt to skip to the next mjpeg when the boot button is pressed
 volatile bool skipRequested = false; // set in ISR, read in loop()
 volatile uint32_t isrTick = 0;       // tick count captured in ISR
-uint32_t lastPress = 0;              // used in main context for debounc
+uint32_t lastPress = 0;              // used in main context for debounce
+uint32_t lastTouchSkip = 0;          // debounce for touch screen skips
 
 void IRAM_ATTR onButtonPress()
 {
@@ -206,8 +208,10 @@ void mjpegPlayFromSDCard(char *mjpegFilename)
             if (now - lastTouchPoll >= TOUCH_POLL_INTERVAL_MS)
             {
                 lastTouchPoll = now;
-                if (touch.Pressed())
+                // Only skip if touch is pressed AND enough time has passed since last touch skip
+                if (touch.Pressed() && (now - lastTouchSkip >= TOUCH_SKIP_DEBOUNCE_MS))
                 {
+                    lastTouchSkip = now;
                     skipRequested = true;
                 }
             }
