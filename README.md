@@ -17,7 +17,7 @@ You can now modify "esp32-2432S028_video_player.ino" in the Arduino IDE and uplo
 ```
 ffmpeg -y -i myvideo.mp4 -pix_fmt yuvj420p -q:v 2 -vf "transpose=1,fps=14,scale=240:320:flags=lanczos" myvideo.mjpeg
 ```
-Unfortunately, VLC or mpv can't play these mjpeg files. You can however extract all frames into a folder and inspect them: `ffmpeg -i fireplace.mjpeg -vcodec copy thevideo/frame%d.jpg`
+Unfortunately, VLC wont play these mjpeg files. You can however put it in an .avi container and play it: `ffmpeg -i myvideo.mjpeg -c:v copy myvideo.avi`
 
 #### Add to the SD card
 1. Remove the micro SD card from the board. You don't need to power down when doing this.
