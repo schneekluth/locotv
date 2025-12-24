@@ -26,8 +26,8 @@
 #define TOUCH_SKIP_DEBOUNCE_MS 1000  // Only skip one video per second when touch is held
 
 // Some model of cheap Yellow display works only at 40Mhz
-// #define DISPLAY_SPI_SPEED 40000000L // 40MHz
-#define DISPLAY_SPI_SPEED 40000000L // 80MHz
+// #define DISPLAY_SPI_SPEED 80000000L // 80MHz
+#define DISPLAY_SPI_SPEED 40000000L // 40MHz
 
 
 #define SD_SPI_SPEED 80000000L      // 80Mhz
@@ -82,8 +82,11 @@ struct VideoStats {
 // Global stats instance (reset per video)
 VideoStats stats;
 
-// Display global variables
-Arduino_DataBus *bus = new Arduino_HWSPI(2 /* DC */, 15 /* CS */, 14 /* SCK */, 13 /* MOSI */, 12 /* MISO */);
+// Display global variables (using ESP32SPI with DMA for better performance)
+Arduino_DataBus *bus = new Arduino_ESP32SPI(
+    2 /* DC */, 15 /* CS */, 14 /* SCK */, 13 /* MOSI */, 12 /* MISO */,
+    HSPI /* SPI bus - display uses HSPI pins */
+);
 Arduino_GFX *gfx = new Arduino_ILI9341(bus);
 
 // SD Card reader is on a separate SPI
