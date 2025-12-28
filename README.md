@@ -19,6 +19,14 @@ ffmpeg -y -i myvideo.mp4 -pix_fmt yuvj420p -q:v 2 -vf "transpose=1,fps=14,scale=
 ```
 Unfortunately, VLC wont play these mjpeg files. You can however put it in an .avi container and play it: `ffmpeg -i myvideo.mjpeg -c:v copy myvideo.avi`
 
+### Converting from the 39c3 video generator
+Video generator: https://39c3.o1y.de/
+
+Crop out the center part of the square video file, scale it to size:
+`ffmpeg -y -i 39C3_06.webm -pix_fmt yuvj420p -q:v 2 -vf "crop=iw:ih/2:0:ih/4,transpose=1,fps=14,scale=240:320:flags=lanczos" 39c3_06.mjpeg`
+
+
+
 #### Add to the SD card
 1. Remove the micro SD card from the board. You don't need to power down when doing this.
 2. Using a SD card reader, you can add video files to the /mjpeg folder. The files need to be in the /mjpeg folder.
