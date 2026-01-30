@@ -26,8 +26,8 @@
 #define TOUCH_SKIP_DEBOUNCE_MS 1000  // Only skip one video per second when touch is held
 
 // Some model of cheap Yellow display works only at 40Mhz
-// #define DISPLAY_SPI_SPEED 80000000L // 80MHz
-#define DISPLAY_SPI_SPEED 40000000L // 40MHz
+#define DISPLAY_SPI_SPEED 80000000L // 80MHz
+// #define DISPLAY_SPI_SPEED 40000000L // 40MHz
 
 
 #define SD_SPI_SPEED 80000000L      // 80Mhz
@@ -35,7 +35,7 @@
 const char *MJPEG_FOLDER = "/mjpeg"; // Name of the mjpeg folder on the SD Card
 
 // Storage for files to read on the SD card
-#define MAX_FILES 20 // Maximum number of files, adjust as needed
+#define MAX_FILES 100 // Maximum number of files, adjust as needed
 String mjpegFileList[MAX_FILES];
 uint32_t mjpegFileSizes[MAX_FILES] = {0}; // Store each GIF file's size in bytes
 int mjpegCount = 0;
@@ -164,7 +164,7 @@ void setup()
     }
     gfx->setRotation(0);
     gfx->fillScreen(RGB565_BLACK);
-    // gfx->invertDisplay(true); // on some cheap yellow models, display must be inverted
+    gfx->invertDisplay(true); // on some cheap yellow models, display must be inverted
     Serial.printf("Screeen size Width=%d,Height=%d\n", gfx->width(), gfx->height());
 
     // Touch screen initialization
