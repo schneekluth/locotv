@@ -13,13 +13,13 @@ foreach ($line in $fileContent) {
 $files = Get-ChildItem -Path $BASE_PATH\* -File -Exclude @("*.ps1", "*.txt")
 
 foreach ($file in $files) {
-    Write-Host "konvertiere $($file.FullName)"
+    Write-Host "Converting $($file.FullName)"
     $filenameNoExt = [System.IO.Path]::GetFileNameWithoutExtension($file)
 
     ffmpeg -y -i $($file.FullName) -pix_fmt yuvj420p -q:v 7 -vf "fps=24,crop=in_w:in_w*4/3:0:(in_h-in_w*4/3)/2,scale=240:-1:flags=lanczos" $BASE_PATH\$filenameNoExt.mjpeg
 
-    Write-Host "lösche $($file.FullName)"
+    Write-Host "Deleting $($file.FullName)"
     Remove-Item -Path $file
 }
 
-Write-Host "`n$($files.Length) Videos gefunden. MAX_FILES auf diesen Wert setzen.`n" -ForegroundColor Yellow
+Write-Host "`n$($files.Length) videos files found. Please adjust MAX_FILES to this value in locotv.ino.`n" -ForegroundColor Yellow
