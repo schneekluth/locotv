@@ -1,3 +1,7 @@
+# This script requires ffmpeg and yt-dlp to be installed.
+# https://www.ffmpeg.org/
+# https://github.com/yt-dlp/yt-dlp
+
 $BASE_PATH = $PSScriptRoot
 $INPUT_VIDEO_FILE = "$BASE_PATH\00_videos.txt"
 
