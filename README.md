@@ -33,11 +33,18 @@ The device is housed in a [3D printed case](stl/) and plays a series of MJPEG fi
 
 ## Convert your own videos
 
+> [!IMPORTANT]
+> This script requires [ffmpeg](https://www.ffmpeg.org/) and [yt-dlp](https://github.com/yt-dlp/yt-dlp) to be installed. You can use this oneliner:
+>
+> ```ps1
+> winget install yt-dlp.yt-dlp Gyan.FFmpeg
+> ```
+
 1. Open [`00_videos.txt`](script/00_videos.txt) and paste links to videos line by line. Use videos in portrait mode e.g. YouTube shorts.
-2. Open a terminal and run the PowerShell script [`00_convertps1`](script/00_convert.ps1).
+2. Open a terminal and run the PowerShell script [`00_convert.ps1`](script/00_convert.ps1).
 3. Copy converted MJPEG files to the `mjpeg/` folder on the SD card.
 4. Adjust value [`MAX_FILES`](https://github.com/schneekluth/locotv/blob/main/locotv.ino#L38) to match the amount of videos copied to the SD card.
-5. Reupload code to the board in Arduino IDE
+5. Reupload code to the board in Arduino IDE.
 
 ## Credits
 
