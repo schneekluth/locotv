@@ -162,13 +162,13 @@ void setup()
             /* no need to continue */
         }
     }
-    gfx->setRotation(0);
+    gfx->setRotation(2);
     gfx->fillScreen(RGB565_BLACK);
     gfx->invertDisplay(true); // on some cheap yellow models, display must be inverted
     Serial.printf("Screeen size Width=%d,Height=%d\n", gfx->width(), gfx->height());
 
     // Touch screen initialization
-    touch.setRotation(0); // Match display rotation
+    touch.setRotation(2); // Match display rotation
 
     // SD card initialization
     Serial.println("SD Card initialization");
