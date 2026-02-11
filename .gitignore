@@ -1,3 +1,8 @@
 build
 .vscode
 secrets.h
+
+# Ignore converted videos
+script/*
+!script/00_videos.txt
+!script/00_convert.ps1
