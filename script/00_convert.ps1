@@ -1,14 +1,23 @@
-# This script requires ffmpeg and yt-dlp to be installed.
+# This script requires ffmpeg, ffprobe and yt-dlp to be installed.
 # https://www.ffmpeg.org/
 # https://github.com/yt-dlp/yt-dlp
 
 $BASE_PATH = $PSScriptRoot
 $INPUT_VIDEO_FILE = "$BASE_PATH\00_videos.txt"
 
+if (-not (Test-Path -Path "$BASE_PATH\mjpeg")) {
+    New-Item -ItemType Directory -Path "$BASE_PATH\mjpeg"
+    Write-Host "Folder created: "$BASE_PATH\mjpeg"" -ForegroundColor Cyan
+}
+
 $fileContent = Get-Content -Encoding UTF8 $INPUT_VIDEO_FILE
 
 foreach ($line in $fileContent) {
-    $name = $line.Split('/')[-1]
+    if ($line -like "*/shorts/*") {
+        $name = $line.Split('/')[-1]
+    } else {
+        $name = $line -match "https://www\.youtube\.com/watch\?v=(.*)"
+    }
 
     Write-Host "Downloading $line"
     yt-dlp $line -o "$BASE_PATH\$name"
@@ -20,10 +29,40 @@ foreach ($file in $files) {
     Write-Host "Converting $($file.FullName)"
     $filenameNoExt = [System.IO.Path]::GetFileNameWithoutExtension($file)
 
-    ffmpeg -y -i $($file.FullName) -pix_fmt yuvj420p -q:v 7 -vf "fps=24,crop=in_w:in_w*4/3:0:(in_h-in_w*4/3)/2,scale=240:-1:flags=lanczos" $BASE_PATH\$filenameNoExt.mjpeg
+    if (Video-IsPortrait($file)) {
+        ffmpeg -y -i $($file.FullName) -pix_fmt yuvj420p -q:v 7 -vf "fps=24,crop=in_w:in_w*4/3:0:(in_h-in_w*4/3)/2,scale=240:-1:flags=lanczos" "$BASE_PATH\mjpeg\portrait_$filenameNoExt.mjpeg"
+    } else {
+        ffmpeg -y -i $($file.FullName) -pix_fmt yuvj420p -q:v 7 -vf  "transpose=1,fps=24,crop=in_w:in_w*4/3:0:(in_h-in_w*4/3)/2,scale=240:-1:flags=lanczos" "$BASE_PATH\mjpeg\landscape_$filenameNoExt.mjpeg"
+    }
 
     Write-Host "Deleting $($file.FullName)"
     Remove-Item -Path $file
 }
 
-Write-Host "`n$($files.Length) videos files found. Please adjust MAX_FILES to this value in locotv.ino.`n" -ForegroundColor Yellow
+Write-Host "`n$($files.Length) videos files found. Please adjust 'MAX_FILES' to this value in locotv.ino.`n" -ForegroundColor Yellow
+
+function Video-IsPortrait {
+    param (
+        [Parameter(Mandatory=$true)]
+        [string]$FilePath
+    )
+
+    # Check if file exists
+    if (-not (Test-Path $FilePath)) {
+        Write-Error "Datei nicht gefunden: $FilePath"
+        return $null
+    }
+
+    # ffprobe: Extract video dimensions
+    $dimensions = ffprobe -v error -select_streams v:0 -show_entries stream=width,height -of csv=p=0:s=x $FilePath
+
+    # ffprobe: extract height and width of video e.g. '1080x1920'
+    $width, $height = $dimensions.Split('x') | ForEach-Object { [int]$_ }
+
+    # boolean return value if video is in portrait or landscape mode
+    if ($height -gt $width) {
+        return $true
+    } else {
+        return $false
+    }
+}
