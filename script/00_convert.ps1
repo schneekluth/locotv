@@ -1,3 +1,6 @@
+# This scripts downloads YouTube videos stored in file '00_videos.txt'
+# ans converts them to MJPEG format with 320x240 resolution.
+#
 # This script requires ffmpeg, ffprobe and yt-dlp to be installed.
 # https://www.ffmpeg.org/
 # https://github.com/yt-dlp/yt-dlp
@@ -7,7 +10,7 @@ $INPUT_VIDEO_FILE = "$BASE_PATH\00_videos.txt"
 
 if (-not (Test-Path -Path "$BASE_PATH\mjpeg")) {
     New-Item -ItemType Directory -Path "$BASE_PATH\mjpeg"
-    Write-Host "Folder created: "$BASE_PATH\mjpeg"" -ForegroundColor Cyan
+    Write-Host "Folder created: "$BASE_PATH\mjpeg"" -ForegroundColor Yellow
 }
 
 $fileContent = Get-Content -Encoding UTF8 $INPUT_VIDEO_FILE
@@ -15,8 +18,10 @@ $fileContent = Get-Content -Encoding UTF8 $INPUT_VIDEO_FILE
 foreach ($line in $fileContent) {
     if ($line -like "*/shorts/*") {
         $name = $line.Split('/')[-1]
+    } elseif ($line -like "https://www.youtube.com/watch?v=*") {
+        $name = $line.Split('=')[-1]
     } else {
-        $name = $line -match "https://www\.youtube\.com/watch\?v=(.*)"
+        name = $line.Split('/')[-1]
     }
 
     Write-Host "Downloading $line"
@@ -39,7 +44,7 @@ foreach ($file in $files) {
     Remove-Item -Path $file
 }
 
-Write-Host "`n$($files.Length) videos files found. Please adjust 'MAX_FILES' to this value in locotv.ino.`n" -ForegroundColor Yellow
+Write-Host "`n$($files.Length) video files found. Please adjust line 'MAX_FILES = $($files.Length)' in 'locotv.ino'.`n" -ForegroundColor Yellow
 
 function Video-IsPortrait {
     param (
